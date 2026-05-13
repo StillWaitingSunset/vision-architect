@@ -20,7 +20,6 @@ import {
   Sparkles,
   Wand2,
   ArrowRight,
-  Home
 } from 'lucide-react';
 
 // =======================================================
