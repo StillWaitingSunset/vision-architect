@@ -193,6 +193,18 @@ const App = () => {
     const langName = LANGUAGES.find(l => l.id === targetLang).name;
 
     try {
+     const executeAnalysis = async () => {
+    if (!base64Image) return;
+    
+    setCurrentStep(2);
+    setProgress(0);
+    setResult(null);
+    setError(null);
+    setLogs([]);
+
+    const langName = LANGUAGES.find(l => l.id === targetLang).name;
+
+    try {
       const promptText = `
         你是一个顶级的 AI 视觉重构引擎、Midjourney v6 首席提示词工程师、好莱坞级摄影指导（DP）和 CGI 渲染大师。你的任务是对上传的图像进行“像素级”的逆向工程，拆解出所有的视觉元素，并最终组合成一段能【完美复刻该原图风格、排版与细节】的神级提示词。
         
@@ -212,24 +224,8 @@ const App = () => {
       let response;
       let rawText = "";
 
-      if (!apiKey) {
-        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYZER_MODEL}:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              role: "user",
-              parts: [{ text: promptText }, { inlineData: { mimeType: imageMimeType, data: base64Image } }]
-            }],
-            generationConfig: { responseMimeType: "application/json" }
-          })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error?.message || "API Request Failed");
-        rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      } else {
-        // 替换掉原来的 if (!apiKey) 和 else 分支的代码，直接使用下面这段：
-      response = await fetch('/api', { // 请求我们刚刚建好的 functions/api.js
+      // 彻底干掉旧的逻辑，只保留纯净的后端代理请求
+      response = await fetch('/api', { 
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json'
@@ -252,7 +248,6 @@ const App = () => {
       
       // 兼容两种返回格式
       rawText = data.choices?.[0]?.message?.content || data.candidates?.[0]?.content?.parts?.[0]?.text;
-      }
       
       if (rawText) {
         let parsedResult;
@@ -274,6 +269,15 @@ const App = () => {
         setTimeout(() => {
           setCurrentStep(3);
         }, 1200);
+
+      } else {
+        throw new Error("Neural link severed. No valid data returned.");
+      }
+    } catch (err) {
+      setError(`ERR_SYS: ${err.message}`);
+      console.error(err);
+    }
+  };
 
       } else {
         throw new Error("Neural link severed. No valid data returned.");
