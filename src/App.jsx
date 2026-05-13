@@ -25,7 +25,7 @@ import {
 // =======================================================
 // 配置专区：代理模式下只需要保留模型名称
 // =======================================================
-const ANALYZER_MODEL = "Qwen/Qwen2-VL-7B-Instruct";
+const ANALYZER_MODEL = "vendor/qwen/qwen2-vl-72b-instruct";
 
 const LANGUAGES = [
   { id: "zh-CN", name: "🇨🇳 简体中文 (Chinese)" },
