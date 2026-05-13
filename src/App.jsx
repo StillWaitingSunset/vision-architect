@@ -25,8 +25,7 @@ import {
 // =======================================================
 // 【NEW API 配置专区】 - 部署到外部时请务必填写这里
 // =======================================================
-const apiKey = "sk-asvczhjtzlgqehhbdfkbjubzsjullcfmmcxrrcuxwxuzewku"; 
-const NEW_API_URL = "https://api.siliconflow.cn/v1/chat/completions";
+
 const ANALYZER_MODEL = "Qwen/Qwen2-VL-72B-Instruct"; 
 // =======================================================
 
@@ -229,27 +228,30 @@ const App = () => {
         if (!response.ok) throw new Error(data.error?.message || "API Request Failed");
         rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
       } else {
-        response = await fetch(NEW_API_URL, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}` 
-          },
-          body: JSON.stringify({
-            model: ANALYZER_MODEL,
-            response_format: { type: "json_object" },
-            messages: [{
-              role: "user",
-              content: [
-                { type: "text", text: promptText },
-                { type: "image_url", image_url: { url: `data:${imageMimeType};base64,${base64Image}` } }
-              ]
-            }]
-          })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error?.message || "New API Request Failed");
-        rawText = data.choices?.[0]?.message?.content;
+        // 替换掉原来的 if (!apiKey) 和 else 分支的代码，直接使用下面这段：
+      response = await fetch('/api', { // 请求我们刚刚建好的 functions/api.js
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: ANALYZER_MODEL,
+          response_format: { type: "json_object" },
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: promptText },
+              { type: "image_url", image_url: { url: `data:${imageMimeType};base64,${base64Image}` } }
+            ]
+          }]
+        })
+      });
+      
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message || data.error || "后端代理请求失败");
+      
+      // 兼容两种返回格式
+      rawText = data.choices?.[0]?.message?.content || data.candidates?.[0]?.content?.parts?.[0]?.text;
       }
       
       if (rawText) {
