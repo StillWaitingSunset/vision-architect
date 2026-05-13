@@ -282,7 +282,7 @@ function App() {
         data.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!rawText) {
-        throw new Error("Neural link severed. No valid data returned.");
+        throw new Error(`Neural link severed. 拦截详情: ${JSON.stringify(data).substring(0, 150)}`);
       }
 
       let parsedResult;
