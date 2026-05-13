@@ -25,7 +25,7 @@ import {
 // =======================================================
 // 配置专区：代理模式下只需要保留模型名称
 // =======================================================
-const ANALYZER_MODEL = "Qwen/Qwen2-VL-72B-Instruct";
+const ANALYZER_MODEL = "OpenGVLab/InternVL2-26B";
 
 const LANGUAGES = [
   { id: "zh-CN", name: "🇨🇳 简体中文 (Chinese)" },
